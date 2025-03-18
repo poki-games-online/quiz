@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px gray;
+            margin-top: 50px;
+        }
+        .hidden { display: none; }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover { background-color: #218838; }
+        .selected { background-color: #007bff !important; color: white; }
+        .fail { color: red; font-size: 20px; font-weight: bold; }
+        .pass { color: green; font-size: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="disclaimer" class="container">
+        <h2>Welcome MY Friend</h2>
+        <p>I want to ask you something. In the end, what you chose I am with you always.</p>
+        <button onclick="startQuiz()">Lets Go  </button>
+    </div>
+    
+    <div id="quiz" class="container hidden">
+        <h2 id="question-text">Question 1: Choose Me or foreigner country?</h2>
+        <button class="option" onclick="selectAnswer(this, true)">Hamza</button>
+        <button class="option" onclick="selectAnswer(this, false)">Foreigner Country </button>
+    </div>
+    
+    <div id="result" class="container hidden"></div>
+    
+    <script>
+        let score = 0;
+        let currentQuestion = 1;
+
+        function startQuiz() {
+            let lastResultTime = localStorage.getItem('quizEndTime');
+            if (lastResultTime && (Date.now() - lastResultTime) < 120000) {
+                document.getElementById('disclaimer').classList.add('hidden');
+                document.getElementById('result').innerHTML = localStorage.getItem('quizResult');
+                document.getElementById('result').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('disclaimer').classList.add('hidden');
+            document.getElementById('quiz').classList.remove('hidden');
+        }
+        
+        function selectAnswer(button, isCorrect) {
+            document.querySelectorAll('.option').forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            
+            if (isCorrect) {
+                score += 50;
+            }
+            
+            setTimeout(nextQuestion, 1000);
+        }
+        
+        function nextQuestion() {
+            if (currentQuestion === 1) {
+                document.getElementById('question-text').innerText = "Question 2: You with Me or Not?";
+                document.getElementById('quiz').innerHTML = `
+                    <h2>Question 2: You with Me or Not?</h2>
+                    <button class="option" onclick="selectAnswer(this, true)">Yes </button>
+                    <button class="option" onclick="selectAnswer(this, false)">Not</button>
+                `;
+                currentQuestion++;
+            } else {
+                showResult();
+            }
+        }
+        
+        function showResult() {
+            document.getElementById('quiz').classList.add('hidden');
+            document.getElementById('result').classList.add('hidden');
+            
+            let resultText = "";
+            
+            if (score === 100) {
+                resultText = "Congratulations! 🎉 You passed with 100 points!";
+            } else if (score === 50) {
+                resultText = "You got 50 points. You passed!";
+            } else {
+                resultText = "FAIL! ❌ You got 0 points.";
+            }
+            
+            resultText += "<br><br>Thanks for participating!";
+
+            localStorage.setItem('quizResult', resultText);
+            localStorage.setItem('quizEndTime', Date.now());
+            
+            setTimeout(() => {
+                document.getElementById('result').innerHTML = resultText;
+                document.getElementById('result').classList.remove('hidden');
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
